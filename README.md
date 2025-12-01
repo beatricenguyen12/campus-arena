@@ -2,17 +2,17 @@
 
 **Name:** CampusArea
 
-**Goal**: Help the first 100 ASU / UTA students use verified university emails to access curated campus info and conect with each other
+**Overview:**
+CampusArena is a lightweight web app that helps students access campus knowledge more easily.
+We provide a simple Q&A experience where students can browse questions, share insights, and learn from peers who’ve been through the same classes and experiences.
 
 **Tech Stack:**
 - Frontend: React/Next.js on Vercel
 - Backend: Node/Express on Render
 - Database: Supabase Postgres
-- Auth: Azure AD (ASU-only or UTA-only, domain restricted)
 
 **MVP Scope:**
-
-v1:
-- Microsoft login with ASU/ UTA email
-- Basic profile
-- One core features: Freshman onboarding threads, composed by seniors/ professors
+- Questions feed
+- Answers from students
+- Upvoting
+- Mobile-friendly web interface
