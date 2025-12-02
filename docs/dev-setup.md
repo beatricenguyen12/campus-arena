@@ -1,11 +1,11 @@
-# Dev Setup (Next.js-only)
+# Dev Setup (Vite SPA)
 
-The repo now contains a single Next.js app (`ca-frontend`). The former Express backend has been removed.
+The repo now ships only the Vite + React + TypeScript frontend in `ca-frontend`. The previous Next.js/Express pieces are gone; the UI runs as a single-page app backed by local mock data in `src/data`.
 
 ## Prerequisites
-- Node.js 20.x
-- npm 10.x+
-- Recommended: VS Code + ESLint/Prettier extensions
+- Node.js 20+
+- npm 10+
+- Recommended: VS Code with the ESLint extension (flat config) and TypeScript tools enabled
 
 ## Install
 ```bash
@@ -13,21 +13,30 @@ cd ca-frontend
 npm install
 ```
 
-## Run dev server
+## Run the dev server
 ```bash
 npm run dev
 ```
-Open http://localhost:3000.
+Vite serves the app on http://localhost:3000 (configured in `vite.config.ts`).
+
+## Build for release
+```bash
+npm run build
+```
+Outputs static assets to `ca-frontend/build`.
 
 ## Lint
+ESLint is configured with TypeScript, React, a11y, and import-order rules via `ca-frontend/eslint.config.cjs`.
 ```bash
 npm run lint
 ```
+Current warnings highlight import grouping and a11y touchpoints; fix or adjust per feature work.
+
+## Project layout
+- Frontend-only SPA: entry at `ca-frontend/src/main.tsx`, app state/flow in `ca-frontend/src/App.tsx`.
+- UI kit and screens live under `ca-frontend/src/components` (design-system pieces in `ca-frontend/src/components/ui`).
+- Mock/domain data in `ca-frontend/src/data`; no external API calls yet.
+- Vite config (`ca-frontend/vite.config.ts`) defines the `@` alias to `src` and builds to `build/`.
 
 ## Environment variables
-- None required for the starter template.
-- Add future secrets to `.env.local` (server-only) or prefix with `NEXT_PUBLIC_` when safe for client use.
-
-## APIs
-- Use Next.js Route Handlers (e.g., `app/api/.../route.ts`) or Server Actions for backend logic.
-- If you previously pointed the frontend at `ca-backend`, update calls to use in-app API routes instead.
+- None required today. Add future secrets to an `.env` consumed by Vite (using `import.meta.env`) and keep anything sensitive server-side if a backend is reintroduced later.
