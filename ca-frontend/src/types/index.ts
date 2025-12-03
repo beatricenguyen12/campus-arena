@@ -12,5 +12,5 @@ export interface Answer {
   timestamp: string;
 }
 
-export type ViewType = 'splash' | 'home' | 'question-detail' | 'ask-question' | 'search';
+export type ViewType = 'home' | 'question-detail' | 'ask-question' | 'search';
 export type TabType = 'answered' | 'needs-answers';

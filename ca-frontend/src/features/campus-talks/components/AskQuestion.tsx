@@ -7,7 +7,11 @@ interface AskQuestionProps {
   onShowSnackbar: (message: string, type: 'success' | 'error') => void;
 }
 
-export function AskQuestion({ onBack, onSubmit, onShowSnackbar }: AskQuestionProps) {
+export function AskQuestion({
+  onBack,
+  onSubmit,
+  onShowSnackbar,
+}: AskQuestionProps) {
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -21,7 +25,7 @@ export function AskQuestion({ onBack, onSubmit, onShowSnackbar }: AskQuestionPro
     }
 
     setIsSubmitting(true);
-    
+
     setTimeout(() => {
       onSubmit(title, body);
       setIsSubmitting(false);
@@ -45,9 +49,12 @@ export function AskQuestion({ onBack, onSubmit, onShowSnackbar }: AskQuestionPro
 
       <div className="flex-1 overflow-y-auto hide-scrollbar">
         <div className="max-w-4xl mx-auto px-6 py-8">
-          <div className="bg-white rounded-[12px] p-6" style={{ boxShadow: '0px 2px 6px rgba(0, 0, 0, 0.06)' }}>
+          <div
+            className="bg-white rounded-[12px] p-6"
+            style={{ boxShadow: '0px 2px 6px rgba(0, 0, 0, 0.06)' }}
+          >
             <h2 className="text-[#1A1A1A] mb-6">Ask a Question</h2>
-            
+
             <div className="space-y-5">
               <div>
                 <label className="block text-[#1A1A1A] mb-2" htmlFor={titleId}>

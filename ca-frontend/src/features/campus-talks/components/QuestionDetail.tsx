@@ -1,21 +1,50 @@
-import { ArrowLeft, Send } from 'lucide-react';
-import { useState } from 'react';
+import { ArrowLeft, MoreVertical, Send, Share2 } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 
-import { Question } from '../types';
-
-import { AnswerCard } from './AnswerCard';
-import { EmptyState } from './EmptyState';
+import { AnswerCard } from '@/components/AnswerCard';
+import { EmptyState } from '@/components/EmptyState';
+import { Question } from '@/types';
 
 interface QuestionDetailProps {
   question: Question;
   onBack: () => void;
   onAddAnswer: (questionId: string, content: string) => void;
   onShowSnackbar: (message: string, type: 'success' | 'error') => void;
+  onShare: (question: Question) => void;
 }
 
-export function QuestionDetail({ question, onBack, onAddAnswer, onShowSnackbar }: QuestionDetailProps) {
+export function QuestionDetail({
+  question,
+  onBack,
+  onAddAnswer,
+  onShowSnackbar,
+  onShare,
+}: QuestionDetailProps) {
   const [answerContent, setAnswerContent] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowMenu(false);
+      }
+    };
+
+    if (showMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showMenu]);
+
+  const handleShareClick = () => {
+    onShare(question);
+    setShowMenu(false);
+  };
 
   const handleSubmit = () => {
     if (!answerContent.trim()) {
@@ -24,7 +53,7 @@ export function QuestionDetail({ question, onBack, onAddAnswer, onShowSnackbar }
     }
 
     setIsSubmitting(true);
-    
+
     setTimeout(() => {
       onAddAnswer(question.id, answerContent);
       setAnswerContent('');
@@ -42,7 +71,6 @@ export function QuestionDetail({ question, onBack, onAddAnswer, onShowSnackbar }
 
   return (
     <div className="h-screen flex flex-col bg-[#F8F9FC]">
-      {/* Header */}
       <div className="bg-white border-b border-[#E5E7EB] flex-shrink-0">
         <div className="max-w-4xl mx-auto px-6 py-4">
           <button
@@ -55,32 +83,52 @@ export function QuestionDetail({ question, onBack, onAddAnswer, onShowSnackbar }
         </div>
       </div>
 
-      {/* Question and Answers - Scrollable */}
       <div className="flex-1 overflow-y-auto hide-scrollbar">
         <div className="max-w-4xl mx-auto px-6 py-6">
-          {/* Question Header */}
-          <div className="bg-white rounded-[12px] p-6 mb-6" style={{ boxShadow: '0px 2px 6px rgba(0, 0, 0, 0.06)' }}>
+          <div
+            className="bg-white rounded-[12px] p-6 mb-6"
+            style={{ boxShadow: '0px 2px 6px rgba(0, 0, 0, 0.06)' }}
+          >
             <h2 className="text-[#1A1A1A] mb-3">{question.title}</h2>
-            {question.body && (
-              <p className="text-[#6B7280] mb-3">{question.body}</p>
-            )}
-            <div className="text-[#6B7280] text-[13px]">
-              Asked {question.timestamp}
+            {question.body && <p className="text-[#6B7280] mb-3">{question.body}</p>}
+            <div className="flex items-center justify-between text-[#6B7280] text-[13px]">
+              <span>Asked {question.timestamp}</span>
+              <div className="relative" ref={menuRef}>
+                <button
+                  onClick={() => setShowMenu(!showMenu)}
+                  className="p-1 hover:bg-[#F8F9FC] rounded-full transition-colors"
+                >
+                  <MoreVertical className="w-5 h-5 text-[#6B7280]" />
+                </button>
+                {showMenu && (
+                  <div
+                    className="absolute right-0 top-8 bg-white rounded-[8px] shadow-lg z-10 py-1"
+                    style={{ boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.15)', minWidth: '140px' }}
+                  >
+                    <button
+                      onClick={handleShareClick}
+                      className="w-full px-4 py-2 flex items-center gap-2 hover:bg-[#F8F9FC] transition-colors text-left"
+                    >
+                      <Share2 className="w-4 h-4 text-[#6B7280]" />
+                      <span className="text-[#1A1A1A] text-sm">Share</span>
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
-          {/* Answers Section */}
           <div className="mb-6">
             <h3 className="text-[#1A1A1A] mb-4">
               {question.answers.length > 0
-                ? `${question.answers.length} ${question.answers.length === 1 ? 'Answer' : 'Answers'}`
+                ? `${question.answers.length} ${
+                    question.answers.length === 1 ? 'Answer' : 'Answers'
+                  }`
                 : 'No Answers Yet'}
             </h3>
-            
+
             {question.answers.length > 0 ? (
-              question.answers.map((answer) => (
-                <AnswerCard key={answer.id} answer={answer} />
-              ))
+              question.answers.map((answer) => <AnswerCard key={answer.id} answer={answer} />)
             ) : (
               <EmptyState message="Be the first to answer this question!" />
             )}
@@ -88,7 +136,6 @@ export function QuestionDetail({ question, onBack, onAddAnswer, onShowSnackbar }
         </div>
       </div>
 
-      {/* Fixed Answer Input at Bottom */}
       <div className="bg-white border-t border-[#E5E7EB] flex-shrink-0">
         <div className="max-w-4xl mx-auto px-6 py-4">
           <div className="flex items-end gap-3">
@@ -101,7 +148,7 @@ export function QuestionDetail({ question, onBack, onAddAnswer, onShowSnackbar }
               disabled={isSubmitting}
               className="flex-1 px-4 py-3 rounded-[10px] border border-[#E5E7EB] focus:outline-none focus:border-[#2A56FF] transition-colors disabled:opacity-50"
             />
-            
+
             <button
               onClick={handleSubmit}
               disabled={isSubmitting}
