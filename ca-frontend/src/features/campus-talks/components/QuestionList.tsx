@@ -1,11 +1,11 @@
 import { EmptyState } from '@/components/EmptyState';
 import { QuestionCard } from '@/components/QuestionCard';
-import { Question } from '@/types';
+import { TalkQuestion } from '@/types';
 
 interface QuestionListProps {
-  questions: Question[];
-  onQuestionClick: (question: Question) => void;
-  onShare: (question: Question) => void;
+  questions: TalkQuestion[];
+  onQuestionClick: (question: TalkQuestion) => void;
+  onShare: (question: TalkQuestion) => void;
   emptyMessage: string;
 }
 

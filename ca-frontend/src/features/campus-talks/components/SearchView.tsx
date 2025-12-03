@@ -1,14 +1,14 @@
 import { FloatingActionButton } from '@/components/FloatingActionButton';
-import { Question } from '@/types';
+import { TalkQuestion } from '@/types';
 
 import { QuestionList } from './QuestionList';
 
 interface SearchViewProps {
-  results: Question[];
+  results: TalkQuestion[];
   searchQuery: string;
-  onQuestionClick: (question: Question) => void;
+  onQuestionClick: (question: TalkQuestion) => void;
   onAskQuestion: () => void;
-  onShare: (question: Question) => void;
+  onShare: (question: TalkQuestion) => void;
 }
 
 export function SearchView({

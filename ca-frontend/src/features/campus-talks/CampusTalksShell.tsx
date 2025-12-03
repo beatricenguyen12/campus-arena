@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { Snackbar } from '@/components/Snackbar';
-import { Question, ViewType } from '@/types';
+import { TalkQuestion, ViewType } from '@/types';
 
 import { ViewRouter } from './components/ViewRouter';
 import { useQuestions } from './hooks/useQuestions';
@@ -12,7 +12,7 @@ export function CampusTalksShell() {
   const [currentView, setCurrentView] = useState<ViewType>('home');
   const { questions, findQuestionById, addAnswer, addQuestion, shareQuestion } =
     useQuestions();
-  const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
+  const [selectedQuestion, setSelectedQuestion] = useState<TalkQuestion | null>(null);
   const { searchQuery, setSearchQuery, searchResults } = useSearch(questions);
   const navigate = useNavigate();
   const { questionId } = useParams();
@@ -22,8 +22,12 @@ export function CampusTalksShell() {
     visible: false,
   });
 
-  const questionFromUrl = questionId ? findQuestionById(questionId) : null;
-  const notFound = Boolean(questionId && !questionFromUrl);
+  const parsedQuestionId = questionId ? Number(questionId) : null;
+  const questionFromUrl =
+    parsedQuestionId && !Number.isNaN(parsedQuestionId)
+      ? findQuestionById(parsedQuestionId)
+      : null;
+  const notFound = Boolean(questionId && parsedQuestionId && !questionFromUrl);
   const activeQuestion = questionFromUrl || selectedQuestion;
   const activeView: ViewType =
     questionId && questionFromUrl
@@ -40,7 +44,7 @@ export function CampusTalksShell() {
     setSnackbar({ ...snackbar, visible: false });
   };
 
-  const handleQuestionClick = (question: Question) => {
+  const handleQuestionClick = (question: TalkQuestion) => {
     const currentQuestion = findQuestionById(question.id) || question;
     setSelectedQuestion(currentQuestion);
     setCurrentView('question-detail');
@@ -60,7 +64,7 @@ export function CampusTalksShell() {
     setSelectedQuestion(null);
   };
 
-  const handleShare = (question: Question) => {
+  const handleShare = (question: TalkQuestion) => {
     const shareUrl = `${window.location.origin}/talks/${question.id}`;
     shareQuestion(
       question,
@@ -69,13 +73,13 @@ export function CampusTalksShell() {
       (message) => showSnackbar(message, 'error'),
     );
   };
-  const handleAddAnswer = (questionId: string, content: string) => {
+  const handleAddAnswer = (questionId: number, content: string) => {
     const newAnswer = addAnswer(questionId, content);
 
     if (activeQuestion && activeQuestion.id === questionId) {
       setSelectedQuestion({
         ...activeQuestion,
-        answers: [...activeQuestion.answers, newAnswer],
+        answers: [...(activeQuestion.answers ?? []), newAnswer],
       });
     }
   };

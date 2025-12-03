@@ -2,17 +2,17 @@ import { useState } from 'react';
 
 import { FloatingActionButton } from '@/components/FloatingActionButton';
 import { Tabs } from '@/components/Tabs';
-import { Question, TabType } from '@/types';
+import { TabType, TalkQuestion } from '@/types';
 
 import { QuestionList } from './QuestionList';
 
 interface HomeViewProps {
-  onQuestionClick: (question: Question) => void;
-  questions: Question[];
+  onQuestionClick: (question: TalkQuestion) => void;
+  questions: TalkQuestion[];
   searchQuery: string;
   onSearch: (query: string) => void;
   onAskQuestion: () => void;
-  onShare: (question: Question) => void;
+  onShare: (question: TalkQuestion) => void;
 }
 
 export function HomeView({
@@ -25,8 +25,10 @@ export function HomeView({
 }: HomeViewProps) {
   const [activeTab, setActiveTab] = useState<TabType>('answered');
 
-  const answeredQuestions = questions.filter((q) => q.answers.length > 0);
-  const needsAnswers = questions.filter((q) => q.answers.length === 0);
+  const answeredQuestions = questions.filter(
+    (q) => (q.answers?.length ?? 0) > 0,
+  );
+  const needsAnswers = questions.filter((q) => (q.answers?.length ?? 0) === 0);
 
   const displayedQuestions =
     activeTab === 'answered' ? answeredQuestions : needsAnswers;

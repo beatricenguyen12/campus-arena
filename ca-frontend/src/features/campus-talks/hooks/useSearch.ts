@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react';
 
-import { Question } from '@/types';
+import { TalkQuestion } from '@/types';
 
-export function useSearch(questions: Question[]) {
+export function useSearch(questions: TalkQuestion[]) {
   const [searchQuery, setSearchQuery] = useState('');
   const normalizedSearch = searchQuery.trim().toLowerCase();
 
@@ -13,7 +13,7 @@ export function useSearch(questions: Question[]) {
       (q) =>
         q.title.toLowerCase().includes(normalizedSearch) ||
         (q.body ?? '').toLowerCase().includes(normalizedSearch) ||
-        q.answers.some((a) =>
+        (q.answers ?? []).some((a) =>
           a.content.toLowerCase().includes(normalizedSearch),
         ),
     );

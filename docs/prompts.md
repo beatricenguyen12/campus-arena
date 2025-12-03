@@ -5,7 +5,7 @@ Use these snippets to get solid, standards-aligned code quickly. Add specifics (
 ### Quick Change (small, scoped)
 - Context: `<what exists, files involved>`
 - Goal: `<small change>`
-- Plan: `<3–5 steps>`
+- Plan: "`<3–5 steps>`. Final step: Add learning notes in section top-down view and step by step detailed changes into docs/learning/`<file_name.md>`. Make the notes digestible to entry-level web developer."
 - Then say: “Implement now. Show diff. Tests: `<commands>`.”
 
 ### New Feature (moderate/bigger)
@@ -36,6 +36,6 @@ Use these snippets to get solid, standards-aligned code quickly. Add specifics (
 
 ### Context to pull before coding
 - What’s built: key modules, entrypoints, routes, data models.
-- Anchors: `README.md`, `docs/dev-setup.md`, `docs/learning/mvp.md`, current `ca-frontend` structure.
+- Anchors: `README.md`, `docs/dev-setup.md`, `docs/learning`, current `ca-frontend` structure.
 - Constraints: feature flags, env vars, external services, TODO/FIXME/bugs.
 - Tests: existing coverage and gaps.

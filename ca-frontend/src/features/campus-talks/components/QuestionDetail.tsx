@@ -3,14 +3,15 @@ import { useEffect, useRef, useState } from 'react';
 
 import { AnswerCard } from '@/components/AnswerCard';
 import { EmptyState } from '@/components/EmptyState';
-import { Question } from '@/types';
+import { TalkQuestion } from '@/types';
+import { formatTimeAgo } from '@/utils/time';
 
 interface QuestionDetailProps {
-  question: Question;
+  question: TalkQuestion;
   onBack: () => void;
-  onAddAnswer: (questionId: string, content: string) => void;
+  onAddAnswer: (questionId: number, content: string) => void;
   onShowSnackbar: (message: string, type: 'success' | 'error') => void;
-  onShare: (question: Question) => void;
+  onShare: (question: TalkQuestion) => void;
 }
 
 export function QuestionDetail({
@@ -24,6 +25,7 @@ export function QuestionDetail({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const answers = question.answers ?? [];
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -92,7 +94,7 @@ export function QuestionDetail({
             <h2 className="text-[#1A1A1A] mb-3">{question.title}</h2>
             {question.body && <p className="text-[#6B7280] mb-3">{question.body}</p>}
             <div className="flex items-center justify-between text-[#6B7280] text-[13px]">
-              <span>Asked {question.timestamp}</span>
+              <span>Asked {formatTimeAgo(question.createdAt)}</span>
               <div className="relative" ref={menuRef}>
                 <button
                   onClick={() => setShowMenu(!showMenu)}
@@ -120,15 +122,13 @@ export function QuestionDetail({
 
           <div className="mb-6">
             <h3 className="text-[#1A1A1A] mb-4">
-              {question.answers.length > 0
-                ? `${question.answers.length} ${
-                    question.answers.length === 1 ? 'Answer' : 'Answers'
-                  }`
+              {answers.length > 0
+                ? `${answers.length} ${answers.length === 1 ? 'Answer' : 'Answers'}`
                 : 'No Answers Yet'}
             </h3>
 
-            {question.answers.length > 0 ? (
-              question.answers.map((answer) => <AnswerCard key={answer.id} answer={answer} />)
+            {answers.length > 0 ? (
+              answers.map((answer) => <AnswerCard key={answer.id} answer={answer} />)
             ) : (
               <EmptyState message="Be the first to answer this question!" />
             )}

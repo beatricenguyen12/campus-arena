@@ -1,7 +1,8 @@
-import { Answer } from '../types';
+import { TalkAnswer } from '@/types';
+import { formatTimeAgo } from '@/utils/time';
 
 interface AnswerCardProps {
-  answer: Answer;
+  answer: TalkAnswer;
 }
 
 export function AnswerCard({ answer }: AnswerCardProps) {
@@ -11,7 +12,9 @@ export function AnswerCard({ answer }: AnswerCardProps) {
       style={{ boxShadow: '0px 2px 6px rgba(0, 0, 0, 0.06)' }}
     >
       <p className="text-[#1A1A1A] mb-2">{answer.content}</p>
-      <div className="text-[#6B7280] text-[13px]">{answer.timestamp}</div>
+      <div className="text-[#6B7280] text-[13px]">
+        {formatTimeAgo(answer.createdAt)}
+      </div>
     </div>
   );
 }

@@ -1,57 +1,74 @@
 import { useCallback, useState } from 'react';
 
 import { sampleQuestions, unansweredQuestions } from '@/data/sampleData';
-import { Answer, Question } from '@/types';
+import { TalkAnswer, TalkQuestion } from '@/types';
+
+const withAnswerArray = (question: TalkQuestion): TalkQuestion => ({
+  ...question,
+  answers: question.answers ?? [],
+});
 
 export function useQuestions() {
-  const [questions, setQuestions] = useState<Question[]>([
-    ...sampleQuestions,
-    ...unansweredQuestions,
+  const [questions, setQuestions] = useState<TalkQuestion[]>([
+    ...sampleQuestions.map(withAnswerArray),
+    ...unansweredQuestions.map(withAnswerArray),
   ]);
 
   const findQuestionById = useCallback(
-    (id: string) => questions.find((q) => q.id === id) ?? null,
+    (id: number) => questions.find((q) => q.id === id) ?? null,
     [questions],
   );
 
-  const addAnswer = useCallback((questionId: string, content: string) => {
-    const newAnswer: Answer = {
-      id: `${questionId}-${Date.now()}`,
+  const addAnswer = useCallback((questionId: number, content: string) => {
+    const allAnswers = questions.flatMap((question) => question.answers ?? []);
+    const nextAnswerId =
+      allAnswers.length > 0
+        ? Math.max(...allAnswers.map((answer) => answer.id)) + 1
+        : 1;
+
+    const newAnswer: TalkAnswer = {
+      id: nextAnswerId,
+      questionId,
       content,
-      timestamp: 'Just now',
+      createdAt: new Date().toISOString(),
     };
 
     setQuestions((prevQuestions) =>
       prevQuestions.map((q) =>
-        q.id === questionId ? { ...q, answers: [...q.answers, newAnswer] } : q,
+        q.id === questionId
+          ? { ...q, answers: [...(q.answers ?? []), newAnswer] }
+          : q,
       ),
     );
 
     return newAnswer;
-  }, []);
+  }, [questions]);
 
   const addQuestion = useCallback((title: string, body?: string) => {
-    const newQuestion: Question = {
-      id: `q-${Date.now()}`,
+    const nextQuestionId =
+      questions.length > 0 ? Math.max(...questions.map((q) => q.id)) + 1 : 1;
+
+    const newQuestion: TalkQuestion = {
+      id: nextQuestionId,
       title,
-      body: body || undefined,
-      timestamp: 'Just now',
+      body: body?.trim() ? body : null,
+      createdAt: new Date().toISOString(),
       answers: [],
     };
 
     setQuestions((prev) => [newQuestion, ...prev]);
     return newQuestion;
-  }, []);
+  }, [questions]);
 
   const buildShareText = useCallback(
-    (question: Question) =>
+    (question: TalkQuestion) =>
       `Check out this question on Campus Arena: ${question.title}`,
     [],
   );
 
   const shareQuestion = useCallback(
     async (
-      question: Question,
+      question: TalkQuestion,
       shareUrl: string,
       onSuccess: (message: string) => void,
       onError: (message: string) => void,

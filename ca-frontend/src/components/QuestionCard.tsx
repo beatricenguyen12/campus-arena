@@ -1,18 +1,32 @@
 import { MoreVertical, Share2 } from 'lucide-react';
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-import { Question } from '../types';
+import { TalkQuestion } from '@/types';
+import { formatTimeAgo } from '@/utils/time';
 
 interface QuestionCardProps {
-  question: Question;
+  question: TalkQuestion;
   onClick: () => void;
-  onShare: (question: Question) => void;
+  onShare: (question: TalkQuestion) => void;
 }
 
 export function QuestionCard({ question, onClick, onShare }: QuestionCardProps) {
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const hasAnswers = question.answers.length > 0;
+  const answers = question.answers ?? [];
+  const hasAnswers = answers.length > 0;
+  const answerCount = answers.length;
+  const lastAnsweredAt = hasAnswers
+    ? answers.reduce(
+        (latest, current) =>
+          new Date(current.createdAt).getTime() >
+          new Date(latest).getTime()
+            ? current.createdAt
+            : latest,
+        answers[0].createdAt,
+      )
+    : null;
+  const lastActivity = lastAnsweredAt ?? question.createdAt;
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -67,10 +81,11 @@ export function QuestionCard({ question, onClick, onShare }: QuestionCardProps) 
         <div className="text-[#6B7280] text-[13px]">
           {hasAnswers ? (
             <>
-              {question.answers.length} {question.answers.length === 1 ? 'answer' : 'answers'} · Last answered {question.timestamp}
+              {answerCount} {answerCount === 1 ? 'answer' : 'answers'} · Last
+              answered {formatTimeAgo(lastActivity)}
             </>
           ) : (
-            <>No answers yet · {question.timestamp}</>
+            <>No answers yet · {formatTimeAgo(question.createdAt)}</>
           )}
         </div>
         
