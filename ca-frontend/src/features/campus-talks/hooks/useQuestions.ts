@@ -1,6 +1,7 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { sampleQuestions, unansweredQuestions } from '@/data/sampleData';
+import { supabase } from '@/lib/supabaseClient';
 import { TalkAnswer, TalkQuestion } from '@/types';
 
 const withAnswerArray = (question: TalkQuestion): TalkQuestion => ({
@@ -8,11 +9,92 @@ const withAnswerArray = (question: TalkQuestion): TalkQuestion => ({
   answers: question.answers ?? [],
 });
 
+const sampleFallback = [
+  ...sampleQuestions.map(withAnswerArray),
+  ...unansweredQuestions.map(withAnswerArray),
+];
+
+type SupabaseQuestionRow = {
+  id: number;
+  title: string;
+  body?: string | null;
+  created_at: string;
+};
+
+type SupabaseAnswerRow = {
+  id: number;
+  question_id: number;
+  content: string;
+  created_at: string;
+};
+
 export function useQuestions() {
-  const [questions, setQuestions] = useState<TalkQuestion[]>([
-    ...sampleQuestions.map(withAnswerArray),
-    ...unansweredQuestions.map(withAnswerArray),
-  ]);
+  const initialQuestions = supabase ? [] : sampleFallback;
+  const [questions, setQuestions] = useState<TalkQuestion[]>(initialQuestions);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchQuestions = async () => {
+      if (!supabase) {
+        setQuestions(sampleFallback);
+        return;
+      }
+
+      const { data: questionRows, error: questionError } = await supabase
+        .from('talks_questions')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      const { data: answerRows, error: answerError } = await supabase
+        .from('talks_answers')
+        .select('*');
+
+      if (questionError || answerError) {
+        console.error('Supabase fetch error', questionError ?? answerError);
+        if (isMounted) {
+          setQuestions(sampleFallback);
+        }
+        return;
+      }
+
+      const answersByQuestion = new Map<number, TalkAnswer[]>();
+      (answerRows ?? []).forEach((answer: SupabaseAnswerRow) => {
+        const mappedAnswer: TalkAnswer = {
+          id: answer.id,
+          questionId: answer.question_id,
+          content: answer.content,
+          createdAt: answer.created_at,
+        };
+
+        const existing = answersByQuestion.get(answer.question_id) ?? [];
+        answersByQuestion.set(answer.question_id, [...existing, mappedAnswer]);
+      });
+
+      const mappedQuestions =
+        questionRows?.map((question: SupabaseQuestionRow) => ({
+          id: question.id,
+          title: question.title,
+          body: question.body ?? null,
+          createdAt: question.created_at,
+          answers: answersByQuestion.get(question.id) ?? [],
+        })) ?? [];
+
+      if (!isMounted) return;
+
+      setQuestions(
+        mappedQuestions.length > 0
+          ? mappedQuestions.map(withAnswerArray)
+          : sampleFallback,
+      );
+    };
+
+    fetchQuestions();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const findQuestionById = useCallback(
     (id: number) => questions.find((q) => q.id === id) ?? null,
