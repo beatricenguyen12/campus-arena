@@ -35,8 +35,11 @@ Current warnings highlight import grouping and a11y touchpoints; fix or adjust p
 ## Project layout
 - Frontend-only SPA: entry at `ca-frontend/src/main.tsx`, app state/flow in `ca-frontend/src/App.tsx`.
 - UI kit and screens live under `ca-frontend/src/components` (design-system pieces in `ca-frontend/src/components/ui`).
-- Mock/domain data in `ca-frontend/src/data`; no external API calls yet.
+- Data: Supabase client reads from Postgres when configured; otherwise the app falls back to mock data in `ca-frontend/src/data`.
 - Vite config (`ca-frontend/vite.config.ts`) defines the `@` alias to `src` and builds to `build/`.
 
 ## Environment variables
-- None required today. Add future secrets to an `.env` consumed by Vite (using `import.meta.env`) and keep anything sensitive server-side if a backend is reintroduced later.
+- Optional Supabase connection: create `ca-frontend/.env.local` (or `.env`) with:
+  - `VITE_SUPABASE_URL=<your-supabase-url>`
+  - `VITE_SUPABASE_ANON_KEY=<your-anon-key>`
+- If these are missing, the app uses local sample data; keep any service key server-side and rely on RLS for anon access.
