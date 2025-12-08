@@ -19,6 +19,17 @@ type SupabaseQuestionRow = {
   title: string;
   body?: string | null;
   created_at: string;
+  user_id?: string | null;
+  tag:
+    | 'academics'
+    | 'orientation_campus_life'
+    | 'housing'
+    | 'jobs_internships'
+    | 'clubs_orgs'
+    | 'life_local_area'
+    | 'international_students'
+    | 'starter_pack'
+    | 'other';
 };
 
 type SupabaseAnswerRow = {
@@ -26,6 +37,7 @@ type SupabaseAnswerRow = {
   question_id: number;
   content: string;
   created_at: string;
+  user_id?: string | null;
 };
 
 export function useQuestions() {
@@ -65,6 +77,7 @@ export function useQuestions() {
           questionId: answer.question_id,
           content: answer.content,
           createdAt: answer.created_at,
+          userId: answer.user_id ?? null,
         };
 
         const existing = answersByQuestion.get(answer.question_id) ?? [];
@@ -77,6 +90,8 @@ export function useQuestions() {
           title: question.title,
           body: question.body ?? null,
           createdAt: question.created_at,
+          userId: question.user_id ?? null,
+          tag: question.tag,
           answers: answersByQuestion.get(question.id) ?? [],
         })) ?? [];
 
@@ -135,6 +150,7 @@ export function useQuestions() {
       title,
       body: body?.trim() ? body : null,
       createdAt: new Date().toISOString(),
+      tag : 'other',
       answers: [],
     };
 

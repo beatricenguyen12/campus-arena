@@ -17,6 +17,7 @@ We provide a simple Q&A experience where students can browse questions, share in
 - Mobile-friendly web interface
 - Questions feed
 - Question detail page
+- Question tags
 - Add answer
 - Sharable link for each question page
 - Basic question search
