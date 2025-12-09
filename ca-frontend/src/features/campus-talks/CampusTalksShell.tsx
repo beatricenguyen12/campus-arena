@@ -84,8 +84,12 @@ export function CampusTalksShell() {
     }
   };
 
-  const handleSubmitQuestion = (title: string, body: string) => {
-    const newQuestion = addQuestion(title, body);
+  const handleSubmitQuestion = async (
+    title: string,
+    body: string,
+    tag: TalkQuestion['tag'],
+  ) => {
+    const newQuestion = await addQuestion(title, body, tag);
     setSelectedQuestion(newQuestion);
 
     setTimeout(() => {

@@ -141,22 +141,58 @@ export function useQuestions() {
     return newAnswer;
   }, [questions]);
 
-  const addQuestion = useCallback((title: string, body?: string) => {
-    const nextQuestionId =
-      questions.length > 0 ? Math.max(...questions.map((q) => q.id)) + 1 : 1;
+  const addQuestion = useCallback(
+    async (title: string, body: string | undefined, tag: TalkQuestion['tag']) => {
+      const trimmedBody = body?.trim() ?? '';
 
-    const newQuestion: TalkQuestion = {
-      id: nextQuestionId,
-      title,
-      body: body?.trim() ? body : null,
-      createdAt: new Date().toISOString(),
-      tag : 'other',
-      answers: [],
-    };
+      if (supabase) {
+        try {
+          const { data, error } = await supabase
+            .from('talks_questions')
+            .insert({
+              title,
+              body: trimmedBody ? trimmedBody : null,
+              tag,
+            })
+            .select()
+            .single();
 
-    setQuestions((prev) => [newQuestion, ...prev]);
-    return newQuestion;
-  }, [questions]);
+          if (!error && data) {
+            const mapped: TalkQuestion = {
+              id: data.id,
+              title: data.title,
+              body: data.body ?? null,
+              createdAt: data.created_at,
+              userId: data.user_id ?? null,
+              tag: data.tag,
+              answers: [],
+            };
+
+            setQuestions((prev) => [mapped, ...prev]);
+            return mapped;
+          }
+        } catch (err) {
+          console.error('Supabase insert question failed', err);
+        }
+      }
+
+      const nextQuestionId =
+        questions.length > 0 ? Math.max(...questions.map((q) => q.id)) + 1 : 1;
+
+      const fallbackQuestion: TalkQuestion = {
+        id: nextQuestionId,
+        title,
+        body: trimmedBody ? trimmedBody : null,
+        createdAt: new Date().toISOString(),
+        tag,
+        answers: [],
+      };
+
+      setQuestions((prev) => [fallbackQuestion, ...prev]);
+      return fallbackQuestion;
+    },
+    [questions],
+  );
 
   const buildShareText = useCallback(
     (question: TalkQuestion) =>
