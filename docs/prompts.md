@@ -5,7 +5,7 @@ Use these snippets to get solid, standards-aligned code quickly. Add specifics (
 ### Quick Change (small, scoped)
 - Context: `<what exists, files involved>`
 - Goal: `<small change>`
-- Plan: "`<3–5 steps>`. Final step: Add learning notes in section top-down view and step by step detailed changes into docs/learning/`<file_name.md>`. Make the notes digestible to entry-level web developer."
+- Plan: "`<3–5 steps>`. Final step: Add learning notes in section top-down view and step by step detailed changes into docs/learning/v0/`<file_name.md>`. Make the notes digestible to entry-level web developer."
 - Then say: “Implement now. Show diff. Tests: `<commands>`.”
 
 ### New Feature (moderate/bigger)
