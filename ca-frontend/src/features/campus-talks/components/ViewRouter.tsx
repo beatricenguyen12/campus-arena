@@ -16,7 +16,7 @@ interface ViewRouterProps {
   onAskQuestion: () => void;
   onBack: () => void;
   onShare: (question: TalkQuestion) => void;
-  onAddAnswer: (questionId: number, content: string) => void;
+  onAddAnswer: (questionId: number, content: string) => Promise<void>;
   onSubmitQuestion: (
     title: string,
     body: string,

@@ -116,30 +116,67 @@ export function useQuestions() {
     [questions],
   );
 
-  const addAnswer = useCallback((questionId: number, content: string) => {
-    const allAnswers = questions.flatMap((question) => question.answers ?? []);
-    const nextAnswerId =
-      allAnswers.length > 0
-        ? Math.max(...allAnswers.map((answer) => answer.id)) + 1
-        : 1;
+  const addAnswer = useCallback(
+    async (questionId: number, content: string) => {
+      if (supabase) {
+        const { data, error } = await supabase
+          .from('talks_answers')
+          .insert({
+            question_id: questionId,
+            content,
+          })
+          .select()
+          .single();
 
-    const newAnswer: TalkAnswer = {
-      id: nextAnswerId,
-      questionId,
-      content,
-      createdAt: new Date().toISOString(),
-    };
+        if (error || !data) {
+          console.error('Supabase insert answer failed', error);
+          throw new Error('Failed to save answer');
+        }
 
-    setQuestions((prevQuestions) =>
-      prevQuestions.map((q) =>
-        q.id === questionId
-          ? { ...q, answers: [...(q.answers ?? []), newAnswer] }
-          : q,
-      ),
-    );
+        const mapped: TalkAnswer = {
+          id: data.id,
+          questionId: data.question_id,
+          content: data.content,
+          createdAt: data.created_at,
+          userId: data.user_id ?? null,
+        };
 
-    return newAnswer;
-  }, [questions]);
+        setQuestions((prevQuestions) =>
+          prevQuestions.map((q) =>
+            q.id === questionId
+              ? { ...q, answers: [...(q.answers ?? []), mapped] }
+              : q,
+          ),
+        );
+
+        return mapped;
+      }
+
+      const allAnswers = questions.flatMap((question) => question.answers ?? []);
+      const nextAnswerId =
+        allAnswers.length > 0
+          ? Math.max(...allAnswers.map((answer) => answer.id)) + 1
+          : 1;
+
+      const fallbackAnswer: TalkAnswer = {
+        id: nextAnswerId,
+        questionId,
+        content,
+        createdAt: new Date().toISOString(),
+      };
+
+      setQuestions((prevQuestions) =>
+        prevQuestions.map((q) =>
+          q.id === questionId
+            ? { ...q, answers: [...(q.answers ?? []), fallbackAnswer] }
+            : q,
+        ),
+      );
+
+      return fallbackAnswer;
+    },
+    [questions],
+  );
 
   const addQuestion = useCallback(
     async (title: string, body: string | undefined, tag: TalkQuestion['tag']) => {

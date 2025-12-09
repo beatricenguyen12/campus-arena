@@ -29,8 +29,7 @@ export function HomeView({
     (q) => (q.answers?.length ?? 0) > 0,
   );
   const needsAnswers = questions.filter((q) => (q.answers?.length ?? 0) === 0);
-
-  console.log(answeredQuestions, needsAnswers);
+  
   const displayedQuestions =
     activeTab === 'answered' ? answeredQuestions : needsAnswers;
 

@@ -111,7 +111,7 @@ export function AskQuestion({
                     focus:outline-none focus:border-[#2A56FF] transition-colors
                     disabled:opacity-50 bg-white"
                   >
-                    <SelectValue placeholder="topic of your question" />
+                    <SelectValue placeholder="Choose your question tag"/>
                   </SelectTrigger>
                   <SelectContent className="bg-white">
                     <SelectItem value="academics">Academics</SelectItem>

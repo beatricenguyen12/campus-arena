@@ -73,8 +73,8 @@ export function CampusTalksShell() {
       (message) => showSnackbar(message, 'error'),
     );
   };
-  const handleAddAnswer = (questionId: number, content: string) => {
-    const newAnswer = addAnswer(questionId, content);
+  const handleAddAnswer = async (questionId: number, content: string) => {
+    const newAnswer = await addAnswer(questionId, content);
 
     if (activeQuestion && activeQuestion.id === questionId) {
       setSelectedQuestion({

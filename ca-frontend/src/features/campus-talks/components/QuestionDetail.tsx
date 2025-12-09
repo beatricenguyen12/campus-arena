@@ -9,7 +9,7 @@ import { formatTimeAgo } from '@/utils/time';
 interface QuestionDetailProps {
   question: TalkQuestion;
   onBack: () => void;
-  onAddAnswer: (questionId: number, content: string) => void;
+  onAddAnswer: (questionId: number, content: string) => Promise<void>;
   onShowSnackbar: (message: string, type: 'success' | 'error') => void;
   onShare: (question: TalkQuestion) => void;
 }
@@ -48,7 +48,7 @@ export function QuestionDetail({
     setShowMenu(false);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!answerContent.trim()) {
       onShowSnackbar('Please write an answer', 'error');
       return;
@@ -56,12 +56,16 @@ export function QuestionDetail({
 
     setIsSubmitting(true);
 
-    setTimeout(() => {
-      onAddAnswer(question.id, answerContent);
+    try {
+      await onAddAnswer(question.id, answerContent);
       setAnswerContent('');
-      setIsSubmitting(false);
       onShowSnackbar('Your answer has been added successfully!', 'success');
-    }, 500);
+    } catch (error) {
+      console.error('Failed to add answer', error);
+      onShowSnackbar('Failed to add your answer. Please try again.', 'error');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
